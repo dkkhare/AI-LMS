@@ -1,0 +1,30 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# PHP/Laravel
+/backend/vendor/
+/backend/storage/*.key
+/backend/storage/logs/
+/backend/bootstrap/cache/
+
+# JavaScript
+node_modules/
+dist/
+build/
+coverage/
+.expo/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local infrastructure state
+.terraform/
+*.tfstate
+*.tfstate.*
