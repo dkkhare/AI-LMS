@@ -19,8 +19,8 @@ This procedure installs the current backend and frontend on one Ubuntu 24.04 LTS
 
 The examples use these placeholders:
 
-- `lms.example.com` — React frontend
-- `api.lms.example.com` — Laravel API
+- `dkprelearn.in` — React frontend
+- `api.dkprelearn.in` — Laravel API
 - `/var/www/ai-lms` — application directory
 - `YOUR_PUBLIC_IP` — the administrator's trusted public IP/CIDR
 
@@ -42,7 +42,7 @@ Replace every placeholder before running the commands.
 
 Do **not** expose MySQL port 3306 to the internet. If the database is later moved to RDS, permit 3306 only from the application security group.
 
-Create DNS `A` records for `lms.example.com` and `api.lms.example.com` pointing to the Elastic IP.
+Create DNS `A` records for `dkprelearn.in` and `api.dkprelearn.in` pointing to the Elastic IP. Add a `www.dkprelearn.in` record only if the `www` address will also be supported.
 
 ### 2. Connect and install system packages
 
@@ -121,7 +121,7 @@ Edit `/var/www/ai-lms/backend/.env` and set at least:
 APP_NAME=AI-LMS
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://api.lms.example.com
+APP_URL=https://api.dkprelearn.in
 
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -150,10 +150,10 @@ php artisan migrate --force
 
 php artisan ai-lms:bootstrap-super-admins \
   --admin1-name="First Super Admin" \
-  --admin1-email="admin1@example.com" \
+  --admin1-email="admin1@dkprelearn.in" \
   --admin1-phone="+919876543210" \
   --admin2-name="Second Super Admin" \
-  --admin2-email="admin2@example.com" \
+  --admin2-email="admin2@dkprelearn.in" \
   --admin2-phone="+919876543211" \
   --region="ap-south-1"
 ```
@@ -192,7 +192,7 @@ cp .env.example .env.production
 Set the production API URL in `.env.production`:
 
 ```dotenv
-VITE_API_URL=https://api.lms.example.com/api/v1
+VITE_API_URL=https://api.dkprelearn.in/api/v1
 ```
 
 Run tests and create the static production build:
@@ -210,7 +210,7 @@ Create `/etc/apache2/sites-available/ai-lms-api.conf`:
 
 ```apache
 <VirtualHost *:80>
-    ServerName api.lms.example.com
+    ServerName api.dkprelearn.in
     DocumentRoot /var/www/ai-lms/backend/public
 
     <Directory /var/www/ai-lms/backend/public>
@@ -233,7 +233,7 @@ Create `/etc/apache2/sites-available/ai-lms-web.conf`:
 
 ```apache
 <VirtualHost *:80>
-    ServerName lms.example.com
+    ServerName dkprelearn.in
     DocumentRoot /var/www/ai-lms/web/dist
 
     <Directory /var/www/ai-lms/web/dist>
@@ -267,7 +267,7 @@ First confirm that both domains load over HTTP and their DNS records resolve to 
 
 ```bash
 sudo apt install -y certbot python3-certbot-apache
-sudo certbot --apache -d lms.example.com -d api.lms.example.com
+sudo certbot --apache -d dkprelearn.in -d api.dkprelearn.in
 sudo certbot renew --dry-run
 ```
 
@@ -290,8 +290,8 @@ When background jobs are added, change `QUEUE_CONNECTION` to the approved MySQL 
 ### 10. Verify the deployment
 
 ```bash
-curl -I https://lms.example.com
-curl https://api.lms.example.com/up
+curl -I https://dkprelearn.in
+curl https://api.dkprelearn.in/up
 cd /var/www/ai-lms/backend && php artisan about
 sudo systemctl status apache2 mysql --no-pager
 sudo tail -n 100 /var/log/apache2/ai-lms-api-error.log
@@ -299,10 +299,10 @@ sudo tail -n 100 /var/log/apache2/ai-lms-api-error.log
 
 Open these pages in a browser:
 
-- `https://lms.example.com/signin`
-- `https://lms.example.com/signup`
-- `https://lms.example.com/tenant-register`
-- `https://api.lms.example.com/up`
+- `https://dkprelearn.in/signin`
+- `https://dkprelearn.in/signup`
+- `https://dkprelearn.in/tenant-register`
+- `https://api.dkprelearn.in/up`
 
 Change both one-time super-administrator passwords immediately. The current development milestone logs OTPs locally and does not yet include production email/SMS delivery or completed MFA enforcement; do not treat it as production-ready until those controls are implemented and tested.
 
