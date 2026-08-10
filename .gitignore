@@ -17,6 +17,9 @@ dist/
 build/
 coverage/
 .expo/
+*.tsbuildinfo
+/web/vite.config.js
+/web/vite.config.d.ts
 
 # Editors and operating systems
 .idea/
