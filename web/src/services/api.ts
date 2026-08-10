@@ -1,6 +1,6 @@
 import type { CreateUserInput, ManagedMember, Page, SaveManagedMemberInput, UpdateUserInput, User, UserStatus } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL ?? 'https://api.dkprelearn.in/api/v1';
 
 export class ApiError extends Error {
   constructor(message: string, public readonly status: number) {
