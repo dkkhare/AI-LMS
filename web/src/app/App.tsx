@@ -5,6 +5,7 @@ import { TenantApprovals } from '../features/tenants/pages/TenantApprovals';
 import { TenantRegistrationPage } from '../features/tenants/pages/TenantRegistrationPage';
 import { AuthPage } from '../features/auth/pages/AuthPage';
 import { RoleDashboard } from '../features/dashboard/pages/RoleDashboard';
+import { RoleMembersPage } from '../features/people/pages/RoleMembersPage';
 
 export function App() {
   const path=window.location.pathname;
@@ -15,7 +16,9 @@ export function App() {
   if(path==='/reset-password')return <AuthPage mode="reset"/>;
   if(path==='/change-password')return <AuthPage mode="change"/>;
   if(path==='/super-admin')return <RoleDashboard role="super"/>;
+  if(path==='/super-admin/admins')return <RoleMembersPage kind="administrators"/>;
   if(path==='/admin')return <RoleDashboard role="admin"/>;
+  if(path==='/admin/teachers'||path==='/tenant/teachers')return <RoleMembersPage kind="teachers"/>;
   if(path==='/tenant')return <RoleDashboard role="tenant"/>;
   const [authenticated, setAuthenticated] = useState(() => Boolean(localStorage.getItem('ai_lms_token')));
   return authenticated ? (new URLSearchParams(window.location.search).get('view')==='tenants'?<TenantApprovals/>:<UserDashboard />) : <Login onAuthenticated={() => setAuthenticated(true)} />;
