@@ -1,4 +1,4 @@
-import type { CreateUserInput, Page, User, UserStatus } from '../types';
+import type { CreateUserInput, ManagedMember, Page, SaveManagedMemberInput, User, UserStatus } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000/api/v1';
 
@@ -62,3 +62,22 @@ export const tenantApi={
  approve:(id:string)=>request(`/admin/tenant-registrations/${id}/approve`,{method:'POST'}),
  reject:(id:string,reason:string)=>request(`/admin/tenant-registrations/${id}/reject`,{method:'POST',body:JSON.stringify({reason})}),
 };
+
+function managedMembersApi(basePath: string) {
+  return {
+    list: (status: UserStatus | 'all', search: string) =>
+      request<Page<ManagedMember>>(`${basePath}?status=${status}&search=${encodeURIComponent(search)}`),
+    create: (input: SaveManagedMemberInput) =>
+      request<{ data: ManagedMember }>(basePath, { method: 'POST', body: JSON.stringify(input) }),
+    update: (id: string, input: SaveManagedMemberInput) =>
+      request<{ data: ManagedMember }>(`${basePath}/${id}`, { method: 'PATCH', body: JSON.stringify(input) }),
+    remove: (id: string) => request<{ message: string }>(`${basePath}/${id}`, { method: 'DELETE' }),
+    approve: (id: string, comment?: string) =>
+      request<{ data: ManagedMember }>(`${basePath}/${id}/approve`, { method: 'POST', body: JSON.stringify({ comment }) }),
+    reject: (id: string, reason: string) =>
+      request<{ data: ManagedMember }>(`${basePath}/${id}/reject`, { method: 'POST', body: JSON.stringify({ reason }) }),
+  };
+}
+
+export const administratorsApi = managedMembersApi('/admin/administrators');
+export const teachersApi = managedMembersApi('/tenant/teachers');
