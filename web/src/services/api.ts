@@ -1,4 +1,4 @@
-import type { CreateUserInput, ManagedMember, Page, SaveManagedMemberInput, User, UserStatus } from '../types';
+import type { CreateUserInput, ManagedMember, Page, SaveManagedMemberInput, UpdateUserInput, User, UserStatus } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000/api/v1';
 
@@ -33,6 +33,9 @@ export const usersApi = {
     request<Page<User>>(`/admin/users?status=${status}&search=${encodeURIComponent(search)}`),
   create: (input: CreateUserInput) =>
     request<{ data: User }>('/admin/users', { method: 'POST', body: JSON.stringify(input) }),
+  update: (id: string, input: UpdateUserInput) =>
+    request<{ data: User }>(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(input) }),
+  remove: (id: string) => request<{ message: string }>(`/admin/users/${id}`, { method: 'DELETE' }),
   approve: (id: string, comment?: string) =>
     request<{ data: User }>(`/admin/users/${id}/approve`, { method: 'POST', body: JSON.stringify({ comment }) }),
   reject: (id: string, reason: string) =>
@@ -55,10 +58,13 @@ export const authApi = {
 };
 
 export interface TenantRegistration { public_id:string; institution_name:string; legal_name?:string; requested_slug:string; constitution_type:string; home_region:string; country_code:string; status:string; submitted_at:string|null; applicant:{display_name:string;email_masked:string;phone_masked:string}; tax_identifiers:Array<{identifier_type:string;masked_value:string;verification_status:string}>; }
+export interface UpdateTenantRegistrationInput { institution_name:string; legal_name?:string; requested_slug:string; constitution_type:string; }
 export const tenantApi={
  register:(input:unknown)=>request<{data:{request_id:string;verification_token:string;status:string}}>('/tenant-registrations',{method:'POST',body:JSON.stringify(input)}),
  verify:(id:string,verification_token:string,channel:'email'|'sms',otp:string)=>request<{data:{status:string}}>(`/tenant-registrations/${id}/verify`,{method:'POST',body:JSON.stringify({verification_token,channel,otp})}),
- list:()=>request<Page<TenantRegistration>>('/admin/tenant-registrations?status=submitted'),
+ list:(status='all',search='')=>request<Page<TenantRegistration>>(`/admin/tenant-registrations?status=${status}&search=${encodeURIComponent(search)}`),
+ update:(id:string,input:UpdateTenantRegistrationInput)=>request<{data:TenantRegistration}>(`/admin/tenant-registrations/${id}`,{method:'PATCH',body:JSON.stringify(input)}),
+ remove:(id:string)=>request<{message:string}>(`/admin/tenant-registrations/${id}`,{method:'DELETE'}),
  approve:(id:string)=>request(`/admin/tenant-registrations/${id}/approve`,{method:'POST'}),
  reject:(id:string,reason:string)=>request(`/admin/tenant-registrations/${id}/reject`,{method:'POST',body:JSON.stringify({reason})}),
 };
