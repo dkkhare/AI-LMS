@@ -48,6 +48,10 @@ export const authApi = {
     method: 'POST', body: JSON.stringify({ email, password }),
   }),
   logout: () => request<{ message: string }>('/auth/logout', { method: 'POST' }),
+  signup: (input: unknown) => request('/auth/signup', { method: 'POST', body: JSON.stringify(input) }),
+  forgotPassword: (email: string, phone: string) => request('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email, phone }) }),
+  resetPassword: (token: string, password: string, password_confirmation: string) => request('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, password, password_confirmation }) }),
+  changePassword: (current_password: string, password: string, password_confirmation: string) => request('/auth/change-password', { method: 'POST', body: JSON.stringify({ current_password, password, password_confirmation }) }),
 };
 
 export interface TenantRegistration { public_id:string; institution_name:string; legal_name?:string; requested_slug:string; constitution_type:string; home_region:string; country_code:string; status:string; submitted_at:string|null; applicant:{display_name:string;email_masked:string;phone_masked:string}; tax_identifiers:Array<{identifier_type:string;masked_value:string;verification_status:string}>; }
