@@ -49,3 +49,12 @@ export const authApi = {
   }),
   logout: () => request<{ message: string }>('/auth/logout', { method: 'POST' }),
 };
+
+export interface TenantRegistration { public_id:string; institution_name:string; legal_name?:string; requested_slug:string; constitution_type:string; home_region:string; country_code:string; status:string; submitted_at:string|null; applicant:{display_name:string;email_masked:string;phone_masked:string}; tax_identifiers:Array<{identifier_type:string;masked_value:string;verification_status:string}>; }
+export const tenantApi={
+ register:(input:unknown)=>request<{data:{request_id:string;verification_token:string;status:string}}>('/tenant-registrations',{method:'POST',body:JSON.stringify(input)}),
+ verify:(id:string,verification_token:string,channel:'email'|'sms',otp:string)=>request<{data:{status:string}}>(`/tenant-registrations/${id}/verify`,{method:'POST',body:JSON.stringify({verification_token,channel,otp})}),
+ list:()=>request<Page<TenantRegistration>>('/admin/tenant-registrations?status=submitted'),
+ approve:(id:string)=>request(`/admin/tenant-registrations/${id}/approve`,{method:'POST'}),
+ reject:(id:string,reason:string)=>request(`/admin/tenant-registrations/${id}/reject`,{method:'POST',body:JSON.stringify({reason})}),
+};
