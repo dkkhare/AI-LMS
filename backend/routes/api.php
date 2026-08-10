@@ -1,6 +1,8 @@
 <?php
 use App\Http\Controllers\Api\V1\AdminTenantRegistrationController;use App\Http\Controllers\Api\V1\AdminUserController;use App\Http\Controllers\Api\V1\AuthController;use App\Http\Controllers\Api\V1\TenantRegistrationController;use App\Http\Controllers\Api\V1\VerificationController;use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function(){
+ Route::post('auth/signup',[AuthController::class,'signup'])->middleware('throttle:3,60');Route::post('auth/verify-signup',[AuthController::class,'verifySignup'])->middleware('throttle:10,1');
+ Route::post('auth/forgot-password',[AuthController::class,'forgotPassword'])->middleware('throttle:3,15');Route::post('auth/verify-reset-otp',[AuthController::class,'verifyResetOtp'])->middleware('throttle:10,1');Route::post('auth/reset-password',[AuthController::class,'resetPassword'])->middleware('throttle:5,1');Route::post('auth/change-password',[AuthController::class,'changePassword'])->middleware('auth:sanctum');
  Route::post('tenant-registrations',[TenantRegistrationController::class,'store'])->middleware('throttle:3,60');
  Route::post('tenant-registrations/{registration}/verify',[TenantRegistrationController::class,'verify'])->middleware('throttle:10,1');
  Route::post('auth/login',[AuthController::class,'login'])->middleware('throttle:5,1');
