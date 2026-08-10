@@ -27,6 +27,7 @@ export function UserDashboard() {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [showCreate, setShowCreate] = useState(false);
+  const [editing, setEditing] = useState<User | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -68,10 +69,17 @@ export function UserDashboard() {
   }
 
   async function createUser(input: CreateUserInput) {
-    await usersApi.create(input);
-    setShowCreate(false);
-    setNotice('User created. Email and mobile verification are now required.');
+    if (editing) await usersApi.update(editing.public_id, input);
+    else await usersApi.create(input);
+    setShowCreate(false); setEditing(null);
+    setNotice(editing ? 'User updated successfully.' : 'User created. Email and mobile verification are now required.');
     await load();
+  }
+
+  async function deleteUser(user: User) {
+    if (!window.confirm(`Delete ${user.display_name}? This action cannot be undone.`)) return;
+    try { await usersApi.remove(user.public_id); setNotice(`${user.display_name} was deleted.`); await load(); }
+    catch (reason) { setError(reason instanceof Error ? reason.message : 'Unable to delete user'); }
   }
 
   return <div className="app-shell">
@@ -113,19 +121,21 @@ export function UserDashboard() {
             <div className="meta"><span>{regionLabel[user.identity_region] ?? user.identity_region}</span><small>Via {user.registered_via.replace('_', ' ')}</small></div>
             <span className={`status status-${user.status}`}>{user.status.replaceAll('_', ' ')}</span>
             <div className="actions">
+              <button onClick={() => { setEditing(user); setShowCreate(true); }}>Edit</button>
               {user.status === 'pending_approval' && <><button className="approve" onClick={() => void act('approve', user)}>Approve</button><button onClick={() => void act('reject', user)}>Reject</button></>}
               {user.status === 'active' && <button onClick={() => void act('suspend', user)}>Suspend</button>}
               {user.status === 'suspended' && <button className="approve" onClick={() => void act('reactivate', user)}>Reactivate</button>}
+              <button className="danger" onClick={() => void deleteUser(user)}>Delete</button>
             </div>
           </article>)}
         </div>}
       </section>
     </main>
-    {showCreate && <CreateUserDialog onClose={() => setShowCreate(false)} onCreate={createUser} />}
+    {showCreate && <CreateUserDialog user={editing} onClose={() => { setShowCreate(false); setEditing(null); }} onCreate={createUser} />}
   </div>;
 }
 
-function CreateUserDialog({ onClose, onCreate }: { onClose: () => void; onCreate: (input: CreateUserInput) => Promise<void> }) {
+function CreateUserDialog({ user, onClose, onCreate }: { user: User | null; onClose: () => void; onCreate: (input: CreateUserInput) => Promise<void> }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -135,5 +145,5 @@ function CreateUserDialog({ onClose, onCreate }: { onClose: () => void; onCreate
       await onCreate({ first_name: String(data.get('first_name')), last_name: String(data.get('last_name')), email: String(data.get('email')), phone: String(data.get('phone')), identity_region: String(data.get('identity_region')) });
     } catch (reason) { setError(reason instanceof Error ? reason.message : 'Unable to create user'); setSaving(false); }
   }
-  return <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="create-title"><div className="modal-head"><div><span className="eyebrow">New account</span><h2 id="create-title">Create user</h2></div><button aria-label="Close" onClick={onClose}>×</button></div><p>The user must verify both email and mobile before approval.</p>{error && <div className="error" role="alert">{error}</div>}<form onSubmit={submit}><div className="form-grid"><label>First name<input required name="first_name" autoFocus /></label><label>Last name<input name="last_name" /></label></div><label>Email address<input required name="email" type="email" /></label><label>Mobile in E.164 format<input required name="phone" type="tel" pattern="\+[1-9][0-9]{7,14}" placeholder="+919876543210" /></label><label>Identity region<select name="identity_region" defaultValue="ap-south-1"><option value="ap-south-1">India</option><option value="eu-central-1">Europe</option><option value="us-east-1">United States</option></select></label><div className="modal-actions"><button type="button" onClick={onClose}>Cancel</button><button className="primary" disabled={saving}>{saving ? 'Creating…' : 'Create and verify'}</button></div></form></section></div>;
+  return <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="create-title"><div className="modal-head"><div><span className="eyebrow">{user?'Update account':'New account'}</span><h2 id="create-title">{user?'Edit user':'Create user'}</h2></div><button aria-label="Close" onClick={onClose}>×</button></div><p>{user?'Update the user identity details. Changed contacts must be verified again.':'The user must verify both email and mobile before approval.'}</p>{error && <div className="error" role="alert">{error}</div>}<form onSubmit={submit}><div className="form-grid"><label>First name<input required name="first_name" defaultValue={user?.first_name??user?.display_name.split(' ')[0]} autoFocus /></label><label>Last name<input name="last_name" defaultValue={user?.last_name??user?.display_name.split(' ').slice(1).join(' ')} /></label></div><label>Email address<input required name="email" type="email" placeholder={user?.email_masked}/></label><label>Mobile in E.164 format<input required name="phone" type="tel" pattern="\+[1-9][0-9]{7,14}" placeholder={user?.phone_masked??'+919876543210'} /></label><label>Identity region<select name="identity_region" defaultValue={user?.identity_region??'ap-south-1'}><option value="ap-south-1">India</option><option value="eu-central-1">Europe</option><option value="us-east-1">United States</option></select></label><div className="modal-actions"><button type="button" onClick={onClose}>Cancel</button><button className="primary" disabled={saving}>{saving ? 'Saving…' : user?'Update user':'Create and verify'}</button></div></form></section></div>;
 }
