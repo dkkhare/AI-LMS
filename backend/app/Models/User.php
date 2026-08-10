@@ -16,5 +16,7 @@ class User extends Authenticatable
     public function uniqueIds(): array { return ['public_id']; }
     public function getRouteKeyName(): string { return 'public_id'; }
     public function approvalRequests(): HasMany { return $this->hasMany(UserApprovalRequest::class, 'subject_user_id'); }
+    public function tenantMemberships(): HasMany { return $this->hasMany(TenantMembership::class); }
+    public function isTenantAdministrator(): bool { return $this->tenantMemberships()->where('role_code','tenant_admin')->where('status','active')->exists(); }
     public function isSuperAdministrator(): bool { return in_array($this->public_id, config('ai_lms.super_admin_public_ids'), true); }
 }
