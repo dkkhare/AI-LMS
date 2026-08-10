@@ -1,10 +1,13 @@
 import { FormEvent, useState } from 'react';
 import { authApi } from './api';
 import { UserDashboard } from './UserDashboard';
+import { TenantApprovals } from './TenantApprovals';
+import { TenantRegistrationPage } from './TenantRegistrationPage';
 
 export function App() {
+  if (window.location.pathname === '/tenant-register') return <TenantRegistrationPage />;
   const [authenticated, setAuthenticated] = useState(() => Boolean(localStorage.getItem('ai_lms_token')));
-  return authenticated ? <UserDashboard /> : <Login onAuthenticated={() => setAuthenticated(true)} />;
+  return authenticated ? (new URLSearchParams(window.location.search).get('view')==='tenants'?<TenantApprovals/>:<UserDashboard />) : <Login onAuthenticated={() => setAuthenticated(true)} />;
 }
 
 function Login({ onAuthenticated }: { onAuthenticated: () => void }) {
