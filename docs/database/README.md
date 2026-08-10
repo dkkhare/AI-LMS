@@ -4,7 +4,15 @@ AI-LMS uses MySQL and a regional, multi-tenant architecture. Database tables are
 
 ## Design workflow
 
-For every table, agree on purpose, columns and MySQL types, keys and indexes, relationships, tenant isolation, validation, privacy, retention, auditing, migration, and rollback.
+For every table, agree on:
+
+1. Purpose and ownership
+2. Columns and MySQL data types
+3. Primary, foreign, unique, and supporting indexes
+4. Tenant-isolation behavior
+5. Validation and lifecycle rules
+6. Privacy, retention, and audit requirements
+7. Laravel migration and rollback strategy
 
 ## Status definitions
 
@@ -12,13 +20,13 @@ For every table, agree on purpose, columns and MySQL types, keys and indexes, re
 - `Approved`: logical design accepted, but not yet implemented.
 - `Implemented`: migration, model, policies, and tests exist.
 - `Released`: deployed to a shared or production environment.
-- `Retired`: no longer used and completing safe removal.
+- `Retired`: no longer used and awaiting or completing safe removal.
 
 ## Current table order
 
 | Order | Table | Status | Purpose |
 |---:|---|---|---|
-| 1 | `users` | Proposed | Identity for all human and service accounts |
+| 1 | `users` | Approved; implementation awaiting user test | Global identity for all human accounts |
 | 2 | `platform_roles` | Pending | Platform-wide roles such as super administrator |
 | 3 | `platform_user_roles` | Pending | Assign platform roles to users |
 | 4 | `tenant_registration_requests` | Pending | Tenant self-registration and super-admin review |
