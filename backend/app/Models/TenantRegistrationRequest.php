@@ -1,0 +1,14 @@
+<?php
+namespace App\Models;
+use Illuminate\Database\Eloquent\Model;use Illuminate\Database\Eloquent\Relations\BelongsTo;use Illuminate\Database\Eloquent\Relations\HasMany;use Illuminate\Database\Eloquent\SoftDeletes;
+class TenantRegistrationRequest extends Model
+{
+ use SoftDeletes;
+ protected $fillable=['public_id','applicant_user_id','registration_token_hash','institution_name','legal_name','requested_slug','constitution_type','constitution_other','incorporation_date','registration_number','home_region','country_code','timezone','default_language','default_currency','status','submitted_at','decided_at','decided_by','decision_reason'];
+ protected $hidden=['registration_token_hash'];
+ protected function casts():array{return['incorporation_date'=>'date','submitted_at'=>'datetime','decided_at'=>'datetime'];}
+ public function applicant():BelongsTo{return $this->belongsTo(User::class,'applicant_user_id');}
+ public function documents():HasMany{return $this->hasMany(TenantRegistrationDocument::class);}
+ public function taxIdentifiers():HasMany{return $this->hasMany(TenantRegistrationTaxIdentifier::class);}
+ public function getRouteKeyName():string{return'public_id';}
+}

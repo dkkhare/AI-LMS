@@ -1,0 +1,20 @@
+<?php
+use App\Http\Controllers\Api\V1\AdministratorController;use App\Http\Controllers\Api\V1\AdminTenantRegistrationController;use App\Http\Controllers\Api\V1\AdminUserController;use App\Http\Controllers\Api\V1\AuthController;use App\Http\Controllers\Api\V1\TeacherController;use App\Http\Controllers\Api\V1\TenantRegistrationController;use App\Http\Controllers\Api\V1\VerificationController;use Illuminate\Support\Facades\Route;
+Route::prefix('v1')->group(function(){
+ Route::post('auth/signup',[AuthController::class,'signup'])->middleware('throttle:3,60');Route::post('auth/verify-signup',[AuthController::class,'verifySignup'])->middleware('throttle:10,1');
+ Route::post('auth/forgot-password',[AuthController::class,'forgotPassword'])->middleware('throttle:3,15');Route::post('auth/verify-reset-otp',[AuthController::class,'verifyResetOtp'])->middleware('throttle:10,1');Route::post('auth/reset-password',[AuthController::class,'resetPassword'])->middleware('throttle:5,1');Route::post('auth/change-password',[AuthController::class,'changePassword'])->middleware('auth:sanctum');
+ Route::post('tenant-registrations',[TenantRegistrationController::class,'store'])->middleware('throttle:3,60');
+ Route::post('tenant-registrations/{registration}/verify',[TenantRegistrationController::class,'verify'])->middleware('throttle:10,1');
+ Route::post('auth/login',[AuthController::class,'login'])->middleware('throttle:5,1');
+ Route::post('auth/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
+ Route::middleware(['auth:sanctum','super_admin'])->prefix('admin')->group(function(){
+  Route::get('users',[AdminUserController::class,'index']); Route::post('users',[AdminUserController::class,'store']);Route::patch('users/{user}',[AdminUserController::class,'update']);Route::delete('users/{user}',[AdminUserController::class,'destroy']);
+  Route::post('users/{user}/approve',[AdminUserController::class,'approve']); Route::post('users/{user}/reject',[AdminUserController::class,'reject']); Route::post('users/{user}/suspend',[AdminUserController::class,'suspend']); Route::post('users/{user}/reactivate',[AdminUserController::class,'reactivate']);
+  Route::post('users/{user}/verification/send',[VerificationController::class,'send']); Route::post('users/{user}/verification/verify',[VerificationController::class,'verify']);
+  Route::get('tenant-registrations',[AdminTenantRegistrationController::class,'index']);Route::patch('tenant-registrations/{registration}',[AdminTenantRegistrationController::class,'update']);Route::delete('tenant-registrations/{registration}',[AdminTenantRegistrationController::class,'destroy']);Route::post('tenant-registrations/{registration}/approve',[AdminTenantRegistrationController::class,'approve']);Route::post('tenant-registrations/{registration}/reject',[AdminTenantRegistrationController::class,'reject']);
+  Route::get('administrators',[AdministratorController::class,'index']);Route::post('administrators',[AdministratorController::class,'store']);Route::patch('administrators/{administrator}',[AdministratorController::class,'update']);Route::delete('administrators/{administrator}',[AdministratorController::class,'destroy']);Route::post('administrators/{administrator}/approve',[AdministratorController::class,'approve']);Route::post('administrators/{administrator}/reject',[AdministratorController::class,'reject']);
+ });
+ Route::middleware(['auth:sanctum','tenant_admin'])->prefix('tenant')->group(function(){
+  Route::get('teachers',[TeacherController::class,'index']);Route::post('teachers',[TeacherController::class,'store']);Route::patch('teachers/{teacher}',[TeacherController::class,'update']);Route::delete('teachers/{teacher}',[TeacherController::class,'destroy']);Route::post('teachers/{teacher}/approve',[TeacherController::class,'approve']);Route::post('teachers/{teacher}/reject',[TeacherController::class,'reject']);Route::post('teachers/{teacher}/verification/send',[TeacherController::class,'sendVerification']);Route::post('teachers/{teacher}/verification/verify',[TeacherController::class,'verify']);
+ });
+});

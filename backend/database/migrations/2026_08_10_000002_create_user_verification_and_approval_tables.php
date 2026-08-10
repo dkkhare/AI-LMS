@@ -1,0 +1,11 @@
+<?php
+use Illuminate\Database\Migrations\Migration; use Illuminate\Database\Schema\Blueprint; use Illuminate\Support\Facades\Schema;
+return new class extends Migration {
+ public function up(): void {
+  Schema::create('verification_challenges', function(Blueprint $table){$table->id();$table->char('public_id',26)->unique();$table->foreignId('user_id')->constrained()->cascadeOnDelete();$table->string('channel',10);$table->string('purpose',30);$table->char('destination_hash',64);$table->string('otp_hash');$table->string('status',20)->default('pending');$table->dateTime('expires_at',6);$table->dateTime('verified_at',6)->nullable();$table->dateTime('invalidated_at',6)->nullable();$table->unsignedTinyInteger('attempt_count')->default(0);$table->unsignedTinyInteger('maximum_attempts')->default(5);$table->unsignedTinyInteger('sent_count')->default(1);$table->dateTime('last_sent_at',6);$table->string('request_ip',45)->nullable();$table->timestamps(6);$table->index(['user_id','channel','purpose','status'],'verification_lookup');});
+  Schema::create('user_approval_requests', function(Blueprint $table){$table->id();$table->char('public_id',26)->unique();$table->foreignId('subject_user_id')->constrained('users')->restrictOnDelete();$table->foreignId('requested_by')->nullable()->constrained('users')->nullOnDelete();$table->string('required_approver_level',40);$table->string('status',30)->default('pending');$table->dateTime('submitted_at',6);$table->dateTime('decided_at',6)->nullable();$table->foreignId('decided_by')->nullable()->constrained('users')->nullOnDelete();$table->string('decision_reason',500)->nullable();$table->timestamps(6);$table->index(['status','required_approver_level']);});
+  Schema::create('user_approval_actions', function(Blueprint $table){$table->id();$table->foreignId('user_approval_request_id')->constrained()->cascadeOnDelete();$table->foreignId('actor_user_id')->nullable()->constrained('users')->nullOnDelete();$table->string('action',30);$table->string('from_status',30)->nullable();$table->string('to_status',30);$table->string('comments',500)->nullable();$table->dateTime('created_at',6);});
+ }
+ public function down(): void {Schema::dropIfExists('user_approval_actions');Schema::dropIfExists('user_approval_requests');Schema::dropIfExists('verification_challenges');}
+};
+
