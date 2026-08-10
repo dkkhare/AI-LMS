@@ -33,3 +33,25 @@ export interface CreateUserInput {
   phone: string;
   identity_region: string;
 }
+
+export type ManagedRole = 'administrator' | 'teacher';
+
+export interface ManagedMember {
+  public_id: string;
+  display_name: string;
+  first_name: string;
+  last_name?: string;
+  email_masked: string;
+  phone_masked: string;
+  status: UserStatus;
+  role: ManagedRole;
+  tenant?: { public_id: string; name: string };
+  created_at: string;
+}
+
+export interface SaveManagedMemberInput {
+  first_name: string;
+  last_name?: string;
+  email: string;
+  phone: string;
+}
