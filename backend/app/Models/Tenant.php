@@ -1,0 +1,2 @@
+<?php
+namespace App\Models;use Illuminate\Database\Eloquent\Model;use Illuminate\Database\Eloquent\SoftDeletes;class Tenant extends Model{use SoftDeletes;protected $fillable=['public_id','name','legal_name','slug','constitution_type','home_region','country_code','timezone','default_language','default_currency','status','source_registration_request_id','approved_by','approved_at'];protected function casts():array{return['approved_at'=>'datetime'];}}
