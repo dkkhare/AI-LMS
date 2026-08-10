@@ -3,9 +3,20 @@ import { authApi } from './api';
 import { UserDashboard } from './UserDashboard';
 import { TenantApprovals } from './TenantApprovals';
 import { TenantRegistrationPage } from './TenantRegistrationPage';
+import { AuthPage } from './AuthPages';
+import { RoleDashboard } from './Dashboards';
 
 export function App() {
-  if (window.location.pathname === '/tenant-register') return <TenantRegistrationPage />;
+  const path=window.location.pathname;
+  if(path==='/tenant-register')return <TenantRegistrationPage/>;
+  if(path==='/signup')return <AuthPage mode="signup"/>;
+  if(path==='/signin')return <AuthPage mode="signin"/>;
+  if(path==='/forgot-password')return <AuthPage mode="forgot"/>;
+  if(path==='/reset-password')return <AuthPage mode="reset"/>;
+  if(path==='/change-password')return <AuthPage mode="change"/>;
+  if(path==='/super-admin')return <RoleDashboard role="super"/>;
+  if(path==='/admin')return <RoleDashboard role="admin"/>;
+  if(path==='/tenant')return <RoleDashboard role="tenant"/>;
   const [authenticated, setAuthenticated] = useState(() => Boolean(localStorage.getItem('ai_lms_token')));
   return authenticated ? (new URLSearchParams(window.location.search).get('view')==='tenants'?<TenantApprovals/>:<UserDashboard />) : <Login onAuthenticated={() => setAuthenticated(true)} />;
 }
