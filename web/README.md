@@ -1,5 +1,14 @@
-# Web Applications
+# AI-LMS Admin Web
 
-React and TypeScript will provide role-aware dashboards for super administrators, tenant administrators, teachers, reviewers, and students.
+React + TypeScript dashboard for super administrators to create, review, approve, reject, suspend, and reactivate users.
 
-The web workspace will share a design system, typed API client, authorization primitives, accessibility standards, and tenant-branding runtime.
+## Setup
+
+```bash
+npm install
+cp .env.example .env
+npm run dev
+```
+
+Set `VITE_API_URL` to the Laravel API URL. Run `npm test` and `npm run build` before publishing.
+
