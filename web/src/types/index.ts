@@ -11,6 +11,8 @@ export type UserStatus =
 export interface User {
   public_id: string;
   display_name: string;
+  first_name?: string;
+  last_name?: string;
   email_masked: string;
   phone_masked: string;
   identity_region: string;
@@ -20,6 +22,8 @@ export interface User {
   phone_verified_at: string | null;
   created_at: string;
 }
+
+export type UpdateUserInput = Partial<CreateUserInput>;
 
 export interface Page<T> {
   data: T[];
